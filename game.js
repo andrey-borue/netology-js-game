@@ -262,7 +262,71 @@ class LevelParser {
   }
 }
 
-class Fireball {
+class Fireball extends Actor {
+  constructor(position, speed) {
+    super(position, new Vector(1, 1), speed);
+  }
+  get type() {
+    return 'fireball';
+  }
+  getNextPosition(time = 1) {
+    return new Vector(this.pos.x + this.speed.x * time, this.pos.y + this.speed.y * time);
+  }
+  handleObstacle() {
+    this.speed.x *= -1;
+    this.speed.y *= -1;
+  }
+  act(time, level) {
 
+  }
+}
 
+class HorizontalFireball extends Fireball {
+  constructor(position) {
+    super(position, new Vector(2, 0));
+  }
+}
+
+class VerticalFireball extends Fireball {
+  constructor(position) {
+    super(position, new Vector(0, 2));
+  }
+}
+
+class FireRain extends Fireball {
+  constructor(position) {
+    super(position, new Vector(0, 3));
+    this.originalPosition = position;
+  }
+  handleObstacle() {
+    this.pos.x = this.originalPosition.x;
+    this.pos.y = this.originalPosition.y;
+  }
+}
+
+class Coin extends Actor {
+  constructor(position) {
+    if (position === undefined) {
+      position = new Vector(0, 0);
+    }
+
+    if (!(position instanceof Vector)) {
+      throw new Error('pos должно быть типа Vector');
+    }
+
+    super(position.plus(new Vector(0.2, 0.1)), new Vector(0.6, 0.6));
+    this.springSpeed = 8;
+
+    this.springDist = 0.07;
+    this.spring = Math.random() * Math.PI * 2;
+  }
+  get type() {
+    return 'coin';
+  }
+  updateSpring(time = 1) {
+    this.spring += this.springSpeed * time;
+  }
+  getSpringVector() {
+    return new Vector(0, Math.sin(this.spring) * this.springDist);
+  }
 }
