@@ -4,7 +4,7 @@ function loadLevels() {
   return new Promise((done, fail) => {
     const xhr = new XMLHttpRequest();
     let url = './levels.json';
-    if (location.hostname !== 'localhost') {
+    if (location.hostname !== 'localhost' && location.hostname !== 'js-game.local') {
       url = 'https://neto-api.herokuapp.com/js/diplom/levels.json';
     }
     xhr.open('GET', url);
