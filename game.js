@@ -18,19 +18,7 @@ class Vector {
 }
 
 class Actor {
-  constructor(pos, size, speed) {
-    if (pos === undefined) {
-      pos = new Vector(0, 0);
-    }
-
-    if (size === undefined) {
-      size = new Vector(1, 1);
-    }
-
-    if (speed === undefined) {
-      speed = new Vector(0, 0);
-    }
-
+  constructor(pos = new Vector(0, 0), size = new Vector(1, 1), speed = new Vector(0, 0)) {
     if (!(pos instanceof Vector)) {
       throw new Error('pos должно быть типа Vector');
     }
@@ -207,39 +195,25 @@ class LevelParser {
   }
 
   createGrid(plan) {
-    let result = [];
-
-    for (let y in plan) {
-      let row = [];
-      if (plan.hasOwnProperty(y)) {
-        for (let x in plan[y]) {
-          if (plan[y].hasOwnProperty(x)) {
-            row.push(this.obstacleFromSymbol(plan[y][x]));
-          }
-        }
-        result.push(row);
-      }
-    }
-
-    return result;
+    return plan.map(row => {
+      return row.split('').map(cell => {
+        return this.obstacleFromSymbol(cell);
+      });
+    });
   }
   createActors(plan) {
-
-    const result = [];
-    for (let y = 0; y < plan.length; y++) {
-      for (let x = 0; x < plan[y].length; x++) {
-        const actor = this.actorFromSymbol(plan[y].charAt(x));
-
+    return plan.reduce((result, row, y) => {
+      row.split('').forEach((cell, x) => {
+        const actor = this.actorFromSymbol(cell);
         if (typeof actor === 'function') {
           const instance = new actor(new Vector(x, y));
           if (instance instanceof Actor) {
             result.push(instance);
           }
         }
-      }
-    }
-
-    return result;
+      });
+      return result;
+    }, []);
   }
   parse(plan) {
     return new Level(this.createGrid(plan), this.createActors(plan));
